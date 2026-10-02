@@ -1,0 +1,4 @@
+workspace/build/
+build/
+*.o
+tenis

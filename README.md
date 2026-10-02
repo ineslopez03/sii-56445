@@ -5,17 +5,12 @@
 ![Lenguaje](https://img.shields.io/badge/C-Programming-00599C?logo=c)
 ![Linux](https://img.shields.io/badge/Linux-Ubuntu-E95420?logo=ubuntu)
 ![Git](https://img.shields.io/badge/Git-Version%20Control-F05032?logo=git)
-
 Material docente de la asignatura **Sistemas Informáticos Industriales** de la **Escuela Técnica Superior de Ingeniería y Diseño Industrial (ETSIDI)** de la **Universidad Politécnica de Madrid (UPM)**.
 
 ---
 
 ## 📖 Descripción
-
-Este repositorio contiene el material utilizado en las prácticas de la asignatura **Sistemas Informáticos Industriales**, incluyendo los guiones y el código de inicio.
-
-El objetivo de la asignatura es introducir en el desarrollo de aplicaciones para sistemas informáticos industriales, haciendo especial énfasis en el uso del lenguaje C y del sistema operativo Linux.
-
+Practica 1 de la asignatura de Sistemas Informaticos Industriales:Entorno de desarrollo bajo Linux.
 ---
 
 ## 📚 Wiki
