@@ -9,7 +9,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
+//Librerias para la FIFO
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -21,7 +25,7 @@ CMundo::CMundo()
 
 CMundo::~CMundo()
 {
-
+close(fd);
 }
 
 void CMundo::InitGL()
@@ -135,6 +139,9 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=2+2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=2+2*rand()/(float)RAND_MAX;
 		puntos2++;
+                char mensaje[100];
+                sprintf(mensaje, "Jugador 2 marca 1 punto, lleva un total de %d puntos.", puntos2);
+                write(fd, mensaje, strlen(mensaje) + 1);
 	}
 
 	if(fondo_dcho.Rebota(esfera))
@@ -144,6 +151,9 @@ void CMundo::OnTimer(int value)
 		esfera.velocidad.x=-2-2*rand()/(float)RAND_MAX;
 		esfera.velocidad.y=-2-2*rand()/(float)RAND_MAX;
 		puntos1++;
+                char mensaje[100];
+                sprintf(mensaje, "Jugador 1 marca 1 punto, lleva un total de %d puntos.", puntos1);
+                write(fd, mensaje, strlen(mensaje) + 1);
 	}
 
 }
@@ -192,4 +202,10 @@ void CMundo::Init()
 	jugador2.g=0;
 	jugador2.x1=6;jugador2.y1=-1;
 	jugador2.x2=6;jugador2.y2=1;
+
+        // Abrir la tubería en modo escritura
+    fd = open("tuberia", O_WRONLY);
+    if (fd < 0) {
+        perror("No se pudo abrir la tuberia para escritura");
+    }
 }
