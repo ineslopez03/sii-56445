@@ -30,5 +30,6 @@ int main(int argc, char **argv) {
     }
     close(fd);
     unlink("tuberia");
+    printf("Fin del juego.Logger terminado.\n");
     return(0);
 }
