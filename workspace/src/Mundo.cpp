@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+//Librerias para la memoria compartida
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -119,6 +123,19 @@ void CMundo::OnDraw()
 
 void CMundo::OnTimer(int value)
 {	
+// Actualizar datos compartidos y mover la raqueta según el bot
+    if (datos_compartidos != nullptr) {
+        datos_compartidos->esfera = esfera;
+        datos_compartidos->raqueta1 = jugador1;
+        if (datos_compartidos->accion == 1) {
+            jugador1.velocidad.y =12;
+        } else if (datos_compartidos->accion == -1) {
+            jugador1.velocidad.y =-12; 
+        } else {
+            jugador1.velocidad.y = 0;
+        }
+    }
+
 	jugador1.Mueve(0.025f);
 	jugador2.Mueve(0.025f);
 	esfera.Mueve(0.025f);
@@ -166,9 +183,7 @@ void CMundo::OnTimer(int value)
                 }
 
 	}
-
 }
-
 void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
 {
 	switch(key)
@@ -218,5 +233,17 @@ void CMundo::Init()
     fd = open("tuberia", O_WRONLY);
     if (fd < 0) {
         perror("No se pudo abrir la tuberia para escritura");
+}
+ // Crear un fichero para la memoria compartida
+      int fd_mem = open("memoria", O_CREAT | O_RDWR, 0666);
+    if (fd_mem == -1) {
+        perror("Error al abrir/crear el fichero de memoria");
     }
+    ftruncate(fd_mem, sizeof(DatosMemCompartida));
+    char* direccion = (char*)mmap(NULL, sizeof(DatosMemCompartida), PROT_READ | PROT_WRITE, MAP_SHARED, fd_mem, 0);
+    if (direccion == MAP_FAILED) {
+        perror("Error en mmap desde tenis");
+    }
+    close(fd_mem);
+    datos_compartidos = (DatosMemCompartida*)direccion;
 }
