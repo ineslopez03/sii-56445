@@ -10,13 +10,13 @@ Material docente de la asignatura **Sistemas Informáticos Industriales** de la 
 ---
 
 ## 📖 Descripción
-Practica 1 de la asignatura de Sistemas Informaticos Industriales:Entorno de desarrollo bajo Linux.
+En la Práctica 4 se ha separado la lógica del juego entre servidor y cliente comunicándolos mediante dos tuberías con nombre (fifo_servidor_cliente y fifo_cliente_servidor).
+ El servidor gestiona la física y recibe de forma concurrente las pulsaciones de teclado del cliente a través de un hilo (pthread).
 ---
 
 ## 📚 Wiki
 
 La documentación detallada de cada una de las prácticas se encuentra en la Wiki del repositorio.
-
 ➡️ **Acceso a la Wiki:**  
 https://github.com/raquelcedazo/sistemas-informaticos-industriales/wiki
 

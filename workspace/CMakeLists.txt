@@ -3,15 +3,14 @@ PROJECT (TENIS)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 
-SET(COMMON_SRCS
-    src/Mundo.cpp
-    src/Esfera.cpp
-    src/Plano.cpp
-    src/Raqueta.cpp
-    src/Vector2D.cpp
-)
+# Ejecutable del servidor (incluye su mundo, componentes y la librería de hilos pthread)
+ADD_EXECUTABLE(servidor src/servidor.cpp src/MundoServidor.cpp src/Esfera.cpp src/Plano.cpp src/Raqueta.cpp src/Vector2D.cpp)
+TARGET_LINK_LIBRARIES(servidor pthread glut GL GLU)
 
-ADD_EXECUTABLE(tenis src/tenis.cpp ${COMMON_SRCS})
+# Ejecutable del cliente (incluye su mundo y los componentes gráficos)
+ADD_EXECUTABLE(cliente src/cliente.cpp src/MundoCliente.cpp src/Esfera.cpp src/Plano.cpp src/Raqueta.cpp src/Vector2D.cpp)
+TARGET_LINK_LIBRARIES(cliente glut GL GLU)
+
+# Ejecutables auxiliares
 ADD_EXECUTABLE(logger src/logger.cpp)
 ADD_EXECUTABLE(bot src/bot.cpp)
-TARGET_LINK_LIBRARIES(tenis glut GL GLU)

@@ -39,6 +39,8 @@ public:
 	int puntos2;
         int fd;
         DatosMemCompartida* datos_compartidos;
+        int tuberia_servidor_cliente;
+        int tuberia_cliente_servidor;
 };
 
 #endif // !defined(AFX_MUNDO_H__9510340A_3D75_485F_93DC_302A43B8039A__INCLUDED_)

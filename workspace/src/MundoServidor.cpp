@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include <fstream>
-#include "Mundo.h"
+#include "MundoServidor.h"
 #include "glut.h"
 
 #include <stdlib.h>
@@ -30,6 +30,10 @@ CMundo::CMundo()
 CMundo::~CMundo()
 {
 close(fd);
+close(tuberia_servidor_cliente);
+unlink("fifo_servidor_cliente");
+close(TUBERIA_CREADA);
+unlink("fifo_cliente_servidor");
 }
 
 void CMundo::InitGL()
@@ -39,7 +43,6 @@ void CMundo::InitGL()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
-	
 	glMatrixMode(GL_PROJECTION);
 	gluPerspective( 40.0, 800/600.0f, 0.1, 150);
 }
@@ -68,8 +71,7 @@ void print(char *mensaje, int x, int y, float r, float g, float b)
 	glRasterPos3f(x, glutGet(GLUT_WINDOW_HEIGHT)-18-y, 0);
 	int len = strlen (mensaje );
 	for (int i = 0; i < len; i++) 
-		glutBitmapCharacter (GLUT_BITMAP_HELVETICA_18, mensaje[i] );
-		
+	glutBitmapCharacter (GLUT_BITMAP_HELVETICA_18, mensaje[i] );
 	glMatrixMode(GL_TEXTURE);
 	glPopMatrix();
 
@@ -121,7 +123,7 @@ void CMundo::OnDraw()
 	glutSwapBuffers();
 }
 
-void CMundo::OnTimer(int value)
+void CMundo:: OnTimer(int value)
 {	
 // Actualizar datos compartidos y mover la raqueta según el bot
     if (datos_compartidos != nullptr) {
@@ -175,28 +177,24 @@ void CMundo::OnTimer(int value)
 		puntos1++;
                 char mensaje[100];
                 sprintf(mensaje, "Jugador 1 marca 1 punto, lleva un total de %d puntos.", puntos1);
-                write(fd, mensaje, strlen(mensaje) + 1);
-                if(puntos1>=3)
+                write(fd, mensaje, strlen(mensaje) + 1);                if(puntos1>=3)
                 { 
                   close(fd);
                   exit(0);
                 }
 
-	}
+	} 
+       char cad[200];
+sprintf(cad,"%f %f %f %f %f %f %f %f %f %f %d %d", esfera.centro.x,esfera.centro.y, jugador1.x1,jugador1.y1,jugador1.x2,jugador1.y2,jugador2.x1,jugador2.y1,jugador2.x2,jugador2.y2, puntos1, puntos2);
+write(tuberia_servidor_cliente, cad, sizeof(cad));
 }
-void CMundo::OnKeyboardDown(unsigned char key, int x, int y)
+void* hilo_comandos(void* d)
 {
-	switch(key)
-	{
-//	case 'a':jugador1.velocidad.x=-1;break;
-//	case 'd':jugador1.velocidad.x=1;break;
-	case 's':jugador1.velocidad.y=-4;break;
-	case 'w':jugador1.velocidad.y=4;break;
-	case 'l':jugador2.velocidad.y=-4;break;
-	case 'o':jugador2.velocidad.y=4;break;
-
-	}
+    CMundo* p = (CMundo*) d;
+    p->RecibeComandosJugador();
+    return NULL; // Es buena práctica añadir el return en los hilos
 }
+
 
 void CMundo::Init()
 {
@@ -246,4 +244,25 @@ void CMundo::Init()
     }
     close(fd_mem);
     datos_compartidos = (DatosMemCompartida*)direccion;
+    
+    mkfifo("fifo_servidor_cliente", 0666); 
+    tuberia_servidor_cliente = open("fifo_servidor_cliente", O_WRONLY);
+
+    mkfifo("fifo_cliente_servidor", 0666);
+    TUBERIA_CREADA = open("fifo_cliente_servidor", O_RDONLY); 
+    pthread_create(&thid1, NULL, hilo_comandos, this);
+}
+
+
+void CMundo::RecibeComandosJugador()
+{
+    while (1) {
+        usleep(10);
+        char cad[100];
+        read(TUBERIA_CREADA, cad, sizeof(cad));
+        unsigned char key;
+        sscanf(cad, "%c", &key);
+        if(key=='l') jugador2.velocidad.y=-4;
+        if(key=='o') jugador2.velocidad.y=4;
+    }
 }
